@@ -53,10 +53,16 @@ else
 
 (function () {
 
-    function identity(x) { return x; }
-    function returnFalse(x) { return false; }
+    function identity(x) {
+        return x;
+    }
 
-    function HookCollection() { }
+    function returnFalse(x) {
+        return false;
+    }
+
+    function HookCollection() {
+    }
 
     HookCollection.prototype = {
 
@@ -96,7 +102,9 @@ else
     // http://meta.stackexchange.com/questions/64655/strange-wmd-bug
     // (granted, switching from Array() to Object() alone would have left only __proto__
     // to be a problem)
-    function SaveHash() { }
+    function SaveHash() {
+    }
+
     SaveHash.prototype = {
         set: function (key, value) {
             this["s_" + key] = value;
@@ -192,7 +200,7 @@ else
                 var cp_Z = "Z".charCodeAt(0);
                 var dist_Za = "a".charCodeAt(0) - cp_Z - 1;
 
-                asciify = function(text) {
+                asciify = function (text) {
                     return text.replace(lettersThatJavaScriptDoesNotKnowAndQ, function (m) {
                         var c = m.charCodeAt(0);
                         var s = "";
@@ -210,7 +218,7 @@ else
                     })
                 };
 
-                deasciify = function(text) {
+                deasciify = function (text) {
                     return text.replace(/Q([A-PR-Za-z]{1,3})Q/g, function (m, s) {
                         var c = 0;
                         var v;
@@ -418,7 +426,7 @@ else
             text = text.replace(/^(<(p|div|h[1-6]|blockquote|pre|table|dl|ol|ul|script|noscript|form|fieldset|iframe|math)\b[^\r]*?.*<\/\2>[ \t]*(?=\n+)\n)/gm, hashMatch);
 
             // Special case just for <hr />. It was easier to make a special case than
-            // to make the other regex more complicated.  
+            // to make the other regex more complicated.
 
             /*
              text = text.replace(/
@@ -487,7 +495,9 @@ else
             return hashBlock(m1);
         }
 
-        var blockGamutHookCallback = function (t) { return _RunBlockGamut(t); }
+        var blockGamutHookCallback = function (t) {
+            return _RunBlockGamut(t);
+        }
 
         function _RunBlockGamut(text, doNotUnhash, doNotCreateParagraphs) {
             //
@@ -563,7 +573,7 @@ else
             // don't conflict with their use in Markdown for code, italics and strong.
             //
 
-            // Build a regex to find HTML tags and comments.  See Friedl's 
+            // Build a regex to find HTML tags and comments.  See Friedl's
             // "Mastering Regular Expressions", 2nd Ed., pp. 200-201.
 
             // SE: changed the comment part of the regex
@@ -837,16 +847,20 @@ else
             // Setext-style headers:
             //  Header 1
             //  ========
-            //  
+            //
             //  Header 2
             //  --------
             //
             text = text.replace(/^(.+)[ \t]*\n=+[ \t]*\n+/gm,
-                function (wholeMatch, m1) { return "<h1>" + _RunSpanGamut(m1) + "</h1>\n\n"; }
+                function (wholeMatch, m1) {
+                    return "<h1>" + _RunSpanGamut(m1) + "</h1>\n\n";
+                }
             );
 
             text = text.replace(/^(.+)[ \t]*\n-+[ \t]*\n+/gm,
-                function (matchFound, m1) { return "<h2>" + _RunSpanGamut(m1) + "</h2>\n\n"; }
+                function (matchFound, m1) {
+                    return "<h2>" + _RunSpanGamut(m1) + "</h2>\n\n";
+                }
             );
 
             // atx-style headers:
@@ -961,7 +975,7 @@ else
             return text;
         }
 
-        var _listItemMarkers = { ol: "\\d+[.]", ul: "[*+-]" };
+        var _listItemMarkers = {ol: "\\d+[.]", ul: "[*+-]"};
 
         function _ProcessListItems(list_str, list_type, isInsideParagraphlessListItem) {
             //
@@ -1052,7 +1066,7 @@ else
         function _DoCodeBlocks(text) {
             //
             //  Process Markdown `<pre><code>` blocks.
-            //  
+            //
 
             /*
              text = text.replace(/
@@ -1095,26 +1109,26 @@ else
         function _DoCodeSpans(text) {
             //
             // * Backtick quotes are used for <code></code> spans.
-            // 
+            //
             // * You can use multiple backticks as the delimiters if you want to
             //   include literal backticks in the code span. So, this input:
-            //     
+            //
             //      Just type ``foo `bar` baz`` at the prompt.
-            //     
+            //
             //   Will translate to:
-            //     
+            //
             //      <p>Just type <code>foo `bar` baz</code> at the prompt.</p>
-            //     
+            //
             //   There's no arbitrary limit to the number of backticks you
             //   can use as delimters. If you need three consecutive backticks
             //   in your code, use four for delimiters, etc.
             //
             // * You can use spaces to get literal backticks at the edges:
-            //     
+            //
             //      ... type `` `bar` `` ...
-            //     
+            //
             //   Turns to:
-            //     
+            //
             //      ... type <code>`bar`</code> ...
             //
 
@@ -1178,7 +1192,7 @@ else
 
         function _DoItalicsAndBoldStrict(text) {
 
-            if (text.indexOf("*") === -1 && text.indexOf("_") === - 1)
+            if (text.indexOf("*") === -1 && text.indexOf("_") === -1)
                 return text;
 
             text = asciify(text);
@@ -1217,7 +1231,7 @@ else
 
         function _DoItalicsAndBold_AllowIntrawordWithAsterisk(text) {
 
-            if (text.indexOf("*") === -1 && text.indexOf("_") === - 1)
+            if (text.indexOf("*") === -1 && text.indexOf("_") === -1)
                 return text;
 
             text = asciify(text);
@@ -1240,7 +1254,7 @@ else
             // (?!\2)                           not followed by the delimiter again (at most one more asterisk/underscore is allowed)
             // (?=\S)                           the first bolded character can't be a space
             // (                                Store in \3: the bolded string
-            //                                  
+            //
             //     (?:|                         Look at all bolded characters except for the last one. Either that's empty, meaning only a single character was bolded...
             //       [^\r]*?                    ... otherwise take arbitrary characters, minimally matching; that's all bolded characters except for the last *two*
             //       (?!\2)                       the last two characters cannot be the delimiter itself (because that would mean four underscores/asterisks in a row)
@@ -1279,7 +1293,7 @@ else
             //             |
             //             \D\*(?=\w)\D         ...or it can be word (otherwise the first alternative would've matched), but only if
             //                                      a) the first italicized character is such a character as well (intra-word emphasis), and
-            //                                      b) neither character on either side of the asterisk is a digit            
+            //                                      b) neither character on either side of the asterisk is a digit
             //         )
             //     )
             //     [^\r]                        actually capture the character (can't use `.` since it could be \n)
