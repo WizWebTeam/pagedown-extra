@@ -1,3 +1,5 @@
+var Markdown = {};
+
 (function () {
     // A quick way to make sure we're only keeping span-level tags when we need to.
     // This isn't supposed to be foolproof. It's just a quick way to make sure we
@@ -878,3 +880,4 @@
 
 })();
 
+module.exports  = Markdown.Extra;
