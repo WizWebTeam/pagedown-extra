@@ -1658,3 +1658,5 @@ else
     }; // end of the Markdown.Converter constructor
 
 })();
+
+export default Markdown;
