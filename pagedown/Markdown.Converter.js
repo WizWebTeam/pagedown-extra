@@ -53,10 +53,15 @@ else
 
 (function () {
 
-    function identity(x) { return x; }
-    function returnFalse(x) { return false; }
+    function identity(x) {
+        return x;
+    }
+    function returnFalse(x) {
+        return false;
+    }
 
-    function HookCollection() { }
+    function HookCollection() {
+    }
 
     HookCollection.prototype = {
 
@@ -96,7 +101,8 @@ else
     // http://meta.stackexchange.com/questions/64655/strange-wmd-bug
     // (granted, switching from Array() to Object() alone would have left only __proto__
     // to be a problem)
-    function SaveHash() { }
+    function SaveHash() {
+    }
     SaveHash.prototype = {
         set: function (key, value) {
             this["s_" + key] = value;
@@ -162,7 +168,7 @@ else
              *
              * delimiting it with "Q" on both sides. For example, the source
              *
-             * > In Chinese, the smurfs are called �{���`, meaning "blue spirits".
+             * > In Chinese, the smurfs are called 藍精靈, meaning "blue spirits".
              *
              * turns into
              *
@@ -180,7 +186,7 @@ else
              * We're using "Q" as the delimiter because it's probably one of the
              * rarest characters, and also because I can't think of any special behavior
              * that would ever be triggered by this letter (to use a silly example, if we
-             * delimited with "H" on the left and "P" on the right, then "��" would be
+             * delimited with "H" on the left and "P" on the right, then "Ψ" would be
              * encoded as "HTTP", which may cause special behavior). The latter would not
              * actually be a huge issue for bold/italic, but may be if we later use it
              * in other places as well.
@@ -192,7 +198,7 @@ else
                 var cp_Z = "Z".charCodeAt(0);
                 var dist_Za = "a".charCodeAt(0) - cp_Z - 1;
 
-                asciify = function(text) {
+                asciify = function (text) {
                     return text.replace(lettersThatJavaScriptDoesNotKnowAndQ, function (m) {
                         var c = m.charCodeAt(0);
                         var s = "";
@@ -210,7 +216,7 @@ else
                     })
                 };
 
-                deasciify = function(text) {
+                deasciify = function (text) {
                     return text.replace(/Q([A-PR-Za-z]{1,3})Q/g, function (m, s) {
                         var c = 0;
                         var v;
@@ -418,7 +424,7 @@ else
             text = text.replace(/^(<(p|div|h[1-6]|blockquote|pre|table|dl|ol|ul|script|noscript|form|fieldset|iframe|math)\b[^\r]*?.*<\/\2>[ \t]*(?=\n+)\n)/gm, hashMatch);
 
             // Special case just for <hr />. It was easier to make a special case than
-            // to make the other regex more complicated.  
+            // to make the other regex more complicated.
 
             /*
              text = text.replace(/
@@ -487,7 +493,9 @@ else
             return hashBlock(m1);
         }
 
-        var blockGamutHookCallback = function (t) { return _RunBlockGamut(t); }
+        var blockGamutHookCallback = function (t) {
+            return _RunBlockGamut(t);
+        }
 
         function _RunBlockGamut(text, doNotUnhash, doNotCreateParagraphs) {
             //
@@ -563,7 +571,7 @@ else
             // don't conflict with their use in Markdown for code, italics and strong.
             //
 
-            // Build a regex to find HTML tags and comments.  See Friedl's 
+            // Build a regex to find HTML tags and comments.  See Friedl's
             // "Mastering Regular Expressions", 2nd Ed., pp. 200-201.
 
             // SE: changed the comment part of the regex
@@ -837,16 +845,20 @@ else
             // Setext-style headers:
             //  Header 1
             //  ========
-            //  
+            //
             //  Header 2
             //  --------
             //
             text = text.replace(/^(.+)[ \t]*\n=+[ \t]*\n+/gm,
-                function (wholeMatch, m1) { return "<h1>" + _RunSpanGamut(m1) + "</h1>\n\n"; }
+                function (wholeMatch, m1) {
+                    return "<h1>" + _RunSpanGamut(m1) + "</h1>\n\n";
+                }
             );
 
             text = text.replace(/^(.+)[ \t]*\n-+[ \t]*\n+/gm,
-                function (matchFound, m1) { return "<h2>" + _RunSpanGamut(m1) + "</h2>\n\n"; }
+                function (matchFound, m1) {
+                    return "<h2>" + _RunSpanGamut(m1) + "</h2>\n\n";
+                }
             );
 
             // atx-style headers:
@@ -912,13 +924,15 @@ else
              /g
              */
             var whole_list = /^(([ ]{0,3}([*+-]|\d+[.])[ \t]+)[^\r]+?(~0|\n{2,}(?=\S)(?![ \t]*(?:[*+-]|\d+[.])[ \t]+)))/gm;
+            var list_type;
             if (g_list_level) {
                 text = text.replace(whole_list, function (wholeMatch, m1, m2) {
                     var list = m1;
-                    var list_type = (m2.search(/[*+-]/g) > -1) ? "ul" : "ol";
-                    var first_number;
-                    if (list_type === "ol")
-                        first_number = parseInt(m2, 10)
+                    list_type = getListType(m2);
+                    //2015-10-22 wiz：删除起始序列号 支持
+                    //var first_number;
+                    //if (list_type === "ol")
+                    //    first_number = parseInt(m2, 10)
 
                     var result = _ProcessListItems(list, list_type, isInsideParagraphlessListItem);
 
@@ -926,32 +940,34 @@ else
                     // up on the preceding line, to get it past the current stupid
                     // HTML block parser. This is a hack to work around the terrible
                     // hack that is the HTML block parser.
-                    result = result.replace(/\s+$/, "");
+                    var resultStr = result.list_str.replace(/\s+$/, "");
                     var opening = "<" + list_type;
-                    if (first_number && first_number !== 1)
-                        opening += " start=\"" + first_number + "\"";
-                    result = opening + ">" + result + "</" + list_type + ">\n";
-                    return result;
+                    //if (first_number && first_number !== 1)
+                    //    opening += " start=\"" + first_number + "\"";
+                    resultStr = opening + ">" + resultStr + "</" + result.list_type + ">\n";
+                    list_type = result.list_type;
+                    return resultStr;
                 });
             } else {
-                whole_list = /(\n\n|^\n?)(([ ]{0,3}([*+-]|\d+[.])[ \t]+)[^\r]+?(~0|\n{2,}(?=\S)(?![ \t]*(?:[*+-]|\d+[.])[ \t]+)))/g;
+                whole_list = /(\n\n|^\n?)(([ ]{0,3}([*+-]|\d+[.])[ \t]+)[^\r]+?(~0|\n{2,}(?=\S)(?![ \t]*(?:[*+-]|\d+[.])[ \t]+)))/gm;
                 text = text.replace(whole_list, function (wholeMatch, m1, m2, m3) {
                     var runup = m1;
                     var list = m2;
-
-                    var list_type = (m3.search(/[*+-]/g) > -1) ? "ul" : "ol";
-
-                    var first_number;
-                    if (list_type === "ol")
-                        first_number = parseInt(m3, 10)
+                    list_type = getListType(m3);
+                    //2015-10-22 wiz：删除起始序列号 支持
+                    //var first_number;
+                    //if (list_type === "ol")
+                    //    first_number = parseInt(m3, 10)
 
                     var result = _ProcessListItems(list, list_type);
-                    var opening = "<" + list_type;
-                    if (first_number && first_number !== 1)
-                        opening += " start=\"" + first_number + "\"";
 
-                    result = runup + opening + ">\n" + result + "</" + list_type + ">\n";
-                    return result;
+                    var opening = "<" + list_type;
+                    //if (first_number && first_number !== 1)
+                    //    opening += " start=\"" + first_number + "\"";
+
+                    var resultStr = runup + opening + ">\n" + result.list_str + "</" + result.list_type + ">\n";
+                    list_type = result.list_type;
+                    return resultStr;
                 });
             }
 
@@ -961,7 +977,11 @@ else
             return text;
         }
 
-        var _listItemMarkers = { ol: "\\d+[.]", ul: "[*+-]" };
+        var _listItemMarkers = {ol: "\\d+[.]", ul: "[*+-]"};
+
+        function getListType(str) {
+            return (str.search(/[*+-]/g) > -1) ? "ul" : "ol";
+        }
 
         function _ProcessListItems(list_str, list_type, isInsideParagraphlessListItem) {
             //
@@ -1024,21 +1044,31 @@ else
              /gm, function(){...});
              */
 
-            var marker = _listItemMarkers[list_type];
-            var re = new RegExp("(^[ \\t]*)(" + marker + ")[ \\t]+([^\\r]+?(\\n+))(?=(~0|\\1(" + marker + ")[ \\t]+))", "gm");
+            //2015-10-22 wiz: 修改 list 的支持规则， 同级的 无序列表 和 有序列表 不会自动处理为 父子关系， 而是生成平级的两个列表；
+            //var marker = _listItemMarkers[list_type];
+            //var re = new RegExp("(^[ \\t]*)(" + marker + ")[ \\t]+([^\\r]+?(\\n+))(?=(~0|\\1(" + marker + ")[ \\t]+))", "gm");
+            var re = new RegExp("(^[ \\t]*)([*+-]|\\d+[.])[ \\t]+([^\\r]+?(\\n+))(?=(~0|\\1([*+-]|\\d+[.])[ \\t]+))", "gm");
             var last_item_had_a_double_newline = false;
             list_str = list_str.replace(re,
                 function (wholeMatch, m1, m2, m3) {
                     var item = m3;
                     var leading_space = m1;
+                    var cur_list_type = getListType(m2);
                     var ends_with_double_newline = /\n\n$/.test(item);
                     var contains_double_newline = ends_with_double_newline || item.search(/\n{2,}/) > -1;
 
                     var loose = contains_double_newline || last_item_had_a_double_newline;
                     item = _RunBlockGamut(_Outdent(item), /* doNotUnhash = */true, /* doNotCreateParagraphs = */ !loose);
 
+                    var itemHtml = '';
+                    if (cur_list_type != list_type) {
+                        itemHtml = '</' + list_type + '>\n<' + cur_list_type + '>\n';
+                        list_type = cur_list_type;
+                    }
+                    itemHtml += ("<li>" + item + "</li>\n");
+
                     last_item_had_a_double_newline = ends_with_double_newline;
-                    return "<li>" + item + "</li>\n";
+                    return itemHtml;
                 }
             );
 
@@ -1046,13 +1076,13 @@ else
             list_str = list_str.replace(/~0/g, "");
 
             g_list_level--;
-            return list_str;
+            return {list_str: list_str, list_type: list_type};
         }
 
         function _DoCodeBlocks(text) {
             //
             //  Process Markdown `<pre><code>` blocks.
-            //  
+            //
 
             /*
              text = text.replace(/
@@ -1095,26 +1125,26 @@ else
         function _DoCodeSpans(text) {
             //
             // * Backtick quotes are used for <code></code> spans.
-            // 
+            //
             // * You can use multiple backticks as the delimiters if you want to
             //   include literal backticks in the code span. So, this input:
-            //     
+            //
             //      Just type ``foo `bar` baz`` at the prompt.
-            //     
+            //
             //   Will translate to:
-            //     
+            //
             //      <p>Just type <code>foo `bar` baz</code> at the prompt.</p>
-            //     
+            //
             //   There's no arbitrary limit to the number of backticks you
             //   can use as delimters. If you need three consecutive backticks
             //   in your code, use four for delimiters, etc.
             //
             // * You can use spaces to get literal backticks at the edges:
-            //     
+            //
             //      ... type `` `bar` `` ...
-            //     
+            //
             //   Turns to:
-            //     
+            //
             //      ... type <code>`bar`</code> ...
             //
 
@@ -1178,7 +1208,7 @@ else
 
         function _DoItalicsAndBoldStrict(text) {
 
-            if (text.indexOf("*") === -1 && text.indexOf("_") === - 1)
+            if (text.indexOf("*") === -1 && text.indexOf("_") === -1)
                 return text;
 
             text = asciify(text);
@@ -1217,7 +1247,7 @@ else
 
         function _DoItalicsAndBold_AllowIntrawordWithAsterisk(text) {
 
-            if (text.indexOf("*") === -1 && text.indexOf("_") === - 1)
+            if (text.indexOf("*") === -1 && text.indexOf("_") === -1)
                 return text;
 
             text = asciify(text);
@@ -1240,7 +1270,7 @@ else
             // (?!\2)                           not followed by the delimiter again (at most one more asterisk/underscore is allowed)
             // (?=\S)                           the first bolded character can't be a space
             // (                                Store in \3: the bolded string
-            //                                  
+            //
             //     (?:|                         Look at all bolded characters except for the last one. Either that's empty, meaning only a single character was bolded...
             //       [^\r]*?                    ... otherwise take arbitrary characters, minimally matching; that's all bolded characters except for the last *two*
             //       (?!\2)                       the last two characters cannot be the delimiter itself (because that would mean four underscores/asterisks in a row)
@@ -1262,7 +1292,11 @@ else
             // )
             // \2                               actually capture the closing delimiter (and make sure that it matches the opening one)
 
-            text = text.replace(/(?=[^\r][*_]|[*_])(^|(?=\W__|(?!\*)[\W_]\*\*|\w\*\*\w)[^\r])(\*\*|__)(?!\2)(?=\S)((?:|[^\r]*?(?!\2)[^\r])(?=\S_|\w|\S\*\*(?:[\W_]|$)).)(?=__(?:\W|$)|\*\*(?:[^*]|$))\2/g,
+
+            //2015-10-26 改善对 xxx**(1)**xxx 的支持
+            //text = text.replace(/(?=[^\r][*_]|[*_])(^|(?=\W__|(?!\*)[\W_]\*\*|\w\*\*\w)[^\r])(\*\*|__)(?!\2)(?=\S)((?:|[^\r]*?(?!\2)[^\r])(?=\S_|\w|\S\*\*(?:[\W_]|$)).)(?=__(?:\W|$)|\*\*(?:[^*]|$))\2/g,
+            //    "$1<strong>$3</strong>");
+            text = text.replace(/(?=[^\r][*_]|[*_])(^|(?=\W__|(?!\*)[\w\W_]\*\*|\w\*\*\w)[^\r])(\*\*|__)(?!\2)(?=\S)((?:|[^\r]*?(?!\2)[^\r])(?=\S_|\w|.\*\*(?:[\w\W_]|$)).)(?=__(?:\W|$)|\*\*(?:[^*]|$))\2/g,
                 "$1<strong>$3</strong>");
 
             // now <em>:
@@ -1279,7 +1313,7 @@ else
             //             |
             //             \D\*(?=\w)\D         ...or it can be word (otherwise the first alternative would've matched), but only if
             //                                      a) the first italicized character is such a character as well (intra-word emphasis), and
-            //                                      b) neither character on either side of the asterisk is a digit            
+            //                                      b) neither character on either side of the asterisk is a digit
             //         )
             //     )
             //     [^\r]                        actually capture the character (can't use `.` since it could be \n)
@@ -1305,7 +1339,10 @@ else
             // )
             // \2                               actually capture the closing delimiter (and make sure that it matches the opening one)
 
-            text = text.replace(/(?=[^\r][*_]|[*_])(^|(?=\W_|(?!\*)(?:[\W_]\*|\D\*(?=\w)\D))[^\r])(\*|_)(?!\2\2\2)(?=\S)((?:(?!\2)[^\r])*?(?=[^\s_]_|(?=\w)\D\*\D|[^\s*]\*(?:[\W_]|$)).)(?=_(?:\W|$)|\*(?:[^*]|$))\2/g,
+            //2015-10-26 改善对 xxx*(1)*xxx 的支持
+            //text = text.replace(/(?=[^\r][*_]|[*_])(^|(?=\W_|(?!\*)(?:[\W_]\*|\D\*(?=\w)\D))[^\r])(\*|_)(?!\2\2\2)(?=\S)((?:(?!\2)[^\r])*?(?=[^\s_]_|(?=\w)\D\*\D|[^\s*]\*(?:[\W_]|$)).)(?=_(?:\W|$)|\*(?:[^*]|$))\2/g,
+            //    "$1<em>$3</em>");
+            text = text.replace(/(?=[^\r][*_]|[*_])(^|(?=\W_|(?!\*)(?:[\w\W_]\*|\D\*(?=\w)\D))[^\r])(\*|_)(?!\2\2\2)(?=\S)((?:(?!\2)[^\r])*?(?=[^\s_]_|(?=[\w\W])\D\*\D|[^\s*]\*(?:[\w\W_]|$)).)(?=_(?:\W|$)|\*(?:[^*]|$))\2/g,
                 "$1<em>$3</em>");
 
             return deasciify(text);
@@ -1453,7 +1490,12 @@ else
             autoLinkRegex = new RegExp("(=\"|<)?\\b(https?|ftp)(://" + charInsideUrl + "*" + charEndingUrl + ")(?=$|\\W)", "gi"),
             endCharRegex = new RegExp(charEndingUrl, "i");
 
-        function handleTrailingParens(wholeMatch, lookbehind, protocol, link) {
+        function handleTrailingParens(wholeMatch, lookbehind, protocol, link, index, str) {
+
+            if (/^<[^<>]*(https?|ftp)/.test(str)) {
+                //避免 html 标签内 属性值的 超链接被替换为 a 标签（例如 img 的src 属性）
+                return wholeMatch;
+            }
             if (lookbehind)
                 return wholeMatch;
             if (link.charAt(link.length - 1) !== ")")
