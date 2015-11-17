@@ -170,7 +170,7 @@ else
              *
              * delimiting it with "Q" on both sides. For example, the source
              *
-             * > In Chinese, the smurfs are called Ë{¾«ì`, meaning "blue spirits".
+             * > In Chinese, the smurfs are called è—ç²¾éˆ, meaning "blue spirits".
              *
              * turns into
              *
@@ -188,7 +188,7 @@ else
              * We're using "Q" as the delimiter because it's probably one of the
              * rarest characters, and also because I can't think of any special behavior
              * that would ever be triggered by this letter (to use a silly example, if we
-             * delimited with "H" on the left and "P" on the right, then "¦·" would be
+             * delimited with "H" on the left and "P" on the right, then "Î¨" would be
              * encoded as "HTTP", which may cause special behavior). The latter would not
              * actually be a huge issue for bold/italic, but may be if we later use it
              * in other places as well.
