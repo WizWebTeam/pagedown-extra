@@ -1616,3 +1616,5 @@ else
     }; // end of the Markdown.Converter constructor
 
 })();
+
+module.exports = Markdown;
