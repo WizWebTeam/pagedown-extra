@@ -535,7 +535,7 @@
             }
             footnoteCounter++;
             self.usedFootnotes.push(id);
-            var html = '<a href="#fn:' + id + '" id="fnref:' + id
+            var html = '<a href="#fn_' + id + '" id="fnref_' + id
                 + '" title="See footnote" class="footnote">' + footnoteCounter
                 + '</a>';
             return self.hashExtraInline(html);
@@ -559,11 +559,11 @@
             self.isConvertingFootnote = true;
             var formattedfootnote = convertSpans(footnote, self);
             delete self.isConvertingFootnote;
-            text += '<li id="fn:'
+            text += '<li id="fn_'
                 + id
                 + '">'
                 + formattedfootnote
-                + ' <a href="#fnref:'
+                + ' <a href="#fnref_'
                 + id
                 + '" title="Return to article" class="reversefootnote">&#8617;</a></li>\n\n';
         }
