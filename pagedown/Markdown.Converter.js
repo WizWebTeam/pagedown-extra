@@ -56,7 +56,6 @@ else
     function identity(x) {
         return x;
     }
-
     function returnFalse(x) {
         return false;
     }
@@ -104,7 +103,6 @@ else
     // to be a problem)
     function SaveHash() {
     }
-
     SaveHash.prototype = {
         set: function (key, value) {
             this["s_" + key] = value;
@@ -926,13 +924,15 @@ else
              /g
              */
             var whole_list = /^(([ ]{0,3}([*+-]|\d+[.])[ \t]+)[^\r]+?(~0|\n{2,}(?=\S)(?![ \t]*(?:[*+-]|\d+[.])[ \t]+)))/gm;
+            var list_type;
             if (g_list_level) {
                 text = text.replace(whole_list, function (wholeMatch, m1, m2) {
                     var list = m1;
-                    var list_type = (m2.search(/[*+-]/g) > -1) ? "ul" : "ol";
-                    var first_number;
-                    if (list_type === "ol")
-                        first_number = parseInt(m2, 10)
+                    list_type = getListType(m2);
+                    //2015-10-22 wiz：删除起始序列号 支持
+                    //var first_number;
+                    //if (list_type === "ol")
+                    //    first_number = parseInt(m2, 10)
 
                     var result = _ProcessListItems(list, list_type, isInsideParagraphlessListItem);
 
@@ -940,32 +940,34 @@ else
                     // up on the preceding line, to get it past the current stupid
                     // HTML block parser. This is a hack to work around the terrible
                     // hack that is the HTML block parser.
-                    result = result.replace(/\s+$/, "");
+                    var resultStr = result.list_str.replace(/\s+$/, "");
                     var opening = "<" + list_type;
-                    if (first_number && first_number !== 1)
-                        opening += " start=\"" + first_number + "\"";
-                    result = opening + ">" + result + "</" + list_type + ">\n";
-                    return result;
+                    //if (first_number && first_number !== 1)
+                    //    opening += " start=\"" + first_number + "\"";
+                    resultStr = opening + ">" + resultStr + "</" + result.list_type + ">\n";
+                    list_type = result.list_type;
+                    return resultStr;
                 });
             } else {
-                whole_list = /(\n\n|^\n?)(([ ]{0,3}([*+-]|\d+[.])[ \t]+)[^\r]+?(~0|\n{2,}(?=\S)(?![ \t]*(?:[*+-]|\d+[.])[ \t]+)))/g;
+                whole_list = /(\n\n|^\n?)(([ ]{0,3}([*+-]|\d+[.])[ \t]+)[^\r]+?(~0|\n{2,}(?=\S)(?![ \t]*(?:[*+-]|\d+[.])[ \t]+)))/gm;
                 text = text.replace(whole_list, function (wholeMatch, m1, m2, m3) {
                     var runup = m1;
                     var list = m2;
-
-                    var list_type = (m3.search(/[*+-]/g) > -1) ? "ul" : "ol";
-
-                    var first_number;
-                    if (list_type === "ol")
-                        first_number = parseInt(m3, 10)
+                    list_type = getListType(m3);
+                    //2015-10-22 wiz：删除起始序列号 支持
+                    //var first_number;
+                    //if (list_type === "ol")
+                    //    first_number = parseInt(m3, 10)
 
                     var result = _ProcessListItems(list, list_type);
-                    var opening = "<" + list_type;
-                    if (first_number && first_number !== 1)
-                        opening += " start=\"" + first_number + "\"";
 
-                    result = runup + opening + ">\n" + result + "</" + list_type + ">\n";
-                    return result;
+                    var opening = "<" + list_type;
+                    //if (first_number && first_number !== 1)
+                    //    opening += " start=\"" + first_number + "\"";
+
+                    var resultStr = runup + opening + ">\n" + result.list_str + "</" + result.list_type + ">\n";
+                    list_type = result.list_type;
+                    return resultStr;
                 });
             }
 
@@ -976,6 +978,10 @@ else
         }
 
         var _listItemMarkers = {ol: "\\d+[.]", ul: "[*+-]"};
+
+        function getListType(str) {
+            return (str.search(/[*+-]/g) > -1) ? "ul" : "ol";
+        }
 
         function _ProcessListItems(list_str, list_type, isInsideParagraphlessListItem) {
             //
@@ -1038,21 +1044,31 @@ else
              /gm, function(){...});
              */
 
-            var marker = _listItemMarkers[list_type];
-            var re = new RegExp("(^[ \\t]*)(" + marker + ")[ \\t]+([^\\r]+?(\\n+))(?=(~0|\\1(" + marker + ")[ \\t]+))", "gm");
+            //2015-10-22 wiz: 修改 list 的支持规则， 同级的 无序列表 和 有序列表 不会自动处理为 父子关系， 而是生成平级的两个列表；
+            //var marker = _listItemMarkers[list_type];
+            //var re = new RegExp("(^[ \\t]*)(" + marker + ")[ \\t]+([^\\r]+?(\\n+))(?=(~0|\\1(" + marker + ")[ \\t]+))", "gm");
+            var re = new RegExp("(^[ \\t]*)([*+-]|\\d+[.])[ \\t]+([^\\r]+?(\\n+))(?=(~0|\\1([*+-]|\\d+[.])[ \\t]+))", "gm");
             var last_item_had_a_double_newline = false;
             list_str = list_str.replace(re,
                 function (wholeMatch, m1, m2, m3) {
                     var item = m3;
                     var leading_space = m1;
+                    var cur_list_type = getListType(m2);
                     var ends_with_double_newline = /\n\n$/.test(item);
                     var contains_double_newline = ends_with_double_newline || item.search(/\n{2,}/) > -1;
 
                     var loose = contains_double_newline || last_item_had_a_double_newline;
                     item = _RunBlockGamut(_Outdent(item), /* doNotUnhash = */true, /* doNotCreateParagraphs = */ !loose);
 
+                    var itemHtml = '';
+                    if (cur_list_type != list_type) {
+                        itemHtml = '</' + list_type + '>\n<' + cur_list_type + '>\n';
+                        list_type = cur_list_type;
+                    }
+                    itemHtml += ("<li>" + item + "</li>\n");
+
                     last_item_had_a_double_newline = ends_with_double_newline;
-                    return "<li>" + item + "</li>\n";
+                    return itemHtml;
                 }
             );
 
@@ -1060,7 +1076,7 @@ else
             list_str = list_str.replace(/~0/g, "");
 
             g_list_level--;
-            return list_str;
+            return {list_str: list_str, list_type: list_type};
         }
 
         function _DoCodeBlocks(text) {
@@ -1276,7 +1292,11 @@ else
             // )
             // \2                               actually capture the closing delimiter (and make sure that it matches the opening one)
 
-            text = text.replace(/(?=[^\r][*_]|[*_])(^|(?=\W__|(?!\*)[\W_]\*\*|\w\*\*\w)[^\r])(\*\*|__)(?!\2)(?=\S)((?:|[^\r]*?(?!\2)[^\r])(?=\S_|\w|\S\*\*(?:[\W_]|$)).)(?=__(?:\W|$)|\*\*(?:[^*]|$))\2/g,
+
+            //2015-10-26 改善对 xxx**(1)**xxx 的支持
+            //text = text.replace(/(?=[^\r][*_]|[*_])(^|(?=\W__|(?!\*)[\W_]\*\*|\w\*\*\w)[^\r])(\*\*|__)(?!\2)(?=\S)((?:|[^\r]*?(?!\2)[^\r])(?=\S_|\w|\S\*\*(?:[\W_]|$)).)(?=__(?:\W|$)|\*\*(?:[^*]|$))\2/g,
+            //    "$1<strong>$3</strong>");
+            text = text.replace(/(?=[^\r][*_]|[*_])(^|(?=\W__|(?!\*)[\w\W_]\*\*|\w\*\*\w)[^\r])(\*\*|__)(?!\2)(?=\S)((?:|[^\r]*?(?!\2)[^\r])(?=\S_|\w|.\*\*(?:[\w\W_]|$)).)(?=__(?:\W|$)|\*\*(?:[^*]|$))\2/g,
                 "$1<strong>$3</strong>");
 
             // now <em>:
@@ -1319,7 +1339,10 @@ else
             // )
             // \2                               actually capture the closing delimiter (and make sure that it matches the opening one)
 
-            text = text.replace(/(?=[^\r][*_]|[*_])(^|(?=\W_|(?!\*)(?:[\W_]\*|\D\*(?=\w)\D))[^\r])(\*|_)(?!\2\2\2)(?=\S)((?:(?!\2)[^\r])*?(?=[^\s_]_|(?=\w)\D\*\D|[^\s*]\*(?:[\W_]|$)).)(?=_(?:\W|$)|\*(?:[^*]|$))\2/g,
+            //2015-10-26 改善对 xxx*(1)*xxx 的支持
+            //text = text.replace(/(?=[^\r][*_]|[*_])(^|(?=\W_|(?!\*)(?:[\W_]\*|\D\*(?=\w)\D))[^\r])(\*|_)(?!\2\2\2)(?=\S)((?:(?!\2)[^\r])*?(?=[^\s_]_|(?=\w)\D\*\D|[^\s*]\*(?:[\W_]|$)).)(?=_(?:\W|$)|\*(?:[^*]|$))\2/g,
+            //    "$1<em>$3</em>");
+            text = text.replace(/(?=[^\r][*_]|[*_])(^|(?=\W_|(?!\*)(?:[\w\W_]\*|\D\*(?=\w)\D))[^\r])(\*|_)(?!\2\2\2)(?=\S)((?:(?!\2)[^\r])*?(?=[^\s_]_|(?=[\w\W])\D\*\D|[^\s*]\*(?:[\w\W_]|$)).)(?=_(?:\W|$)|\*(?:[^*]|$))\2/g,
                 "$1<em>$3</em>");
 
             return deasciify(text);
@@ -1467,7 +1490,12 @@ else
             autoLinkRegex = new RegExp("(=\"|<)?\\b(https?|ftp)(://" + charInsideUrl + "*" + charEndingUrl + ")(?=$|\\W)", "gi"),
             endCharRegex = new RegExp(charEndingUrl, "i");
 
-        function handleTrailingParens(wholeMatch, lookbehind, protocol, link) {
+        function handleTrailingParens(wholeMatch, lookbehind, protocol, link, index, str) {
+
+            if (/^<[^<>]*(https?|ftp)/.test(str)) {
+                //避免 html 标签内 属性值的 超链接被替换为 a 标签（例如 img 的src 属性）
+                return wholeMatch;
+            }
             if (lookbehind)
                 return wholeMatch;
             if (link.charAt(link.length - 1) !== ")")
