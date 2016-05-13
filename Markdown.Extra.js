@@ -385,7 +385,7 @@
      * Tables                                                         *
      *****************************************************************/
 
-        // Find and convert Markdown Extra tables into html.
+    // Find and convert Markdown Extra tables into html.
     Markdown.Extra.prototype.tables = function (text) {
         var self = this;
 
@@ -501,7 +501,7 @@
      * Footnotes                                                      *
      *****************************************************************/
 
-        // Strip footnote, store in hashes.
+    // Strip footnote, store in hashes.
     Markdown.Extra.prototype.stripFootnoteDefinitions = function (text) {
         var self = this;
 
@@ -576,7 +576,7 @@
      * Fenced Code Blocks  (gfm)                                       *
      ******************************************************************/
 
-        // Find and convert gfm-inspired fenced code blocks into html.
+    // Find and convert gfm-inspired fenced code blocks into html.
     Markdown.Extra.prototype.fencedCodeBlocks = function (text) {
         function encodeCode(code) {
             code = code.replace(/&/g, "&amp;");
@@ -667,55 +667,55 @@
         // Ellipses
         text = text.replace(/\.\.\./g, "&#8230;").replace(/\.\s\.\s\./g, "&#8230;");
         // Backticks
-        text = text.replace(/``/g, "&#8220;").replace(/''/g, "&#8221;");
+        // text = text.replace(/``/g, "&#8220;").replace(/''/g, "&#8221;");
 
-        if (/^'$/.test(text)) {
-            // Special case: single-character ' token
-            if (/\S/.test(this.smartyPantsLastChar)) {
-                return "&#8217;";
-            }
-            return "&#8216;";
-        }
-        if (/^"$/.test(text)) {
-            // Special case: single-character " token
-            if (/\S/.test(this.smartyPantsLastChar)) {
-                return "&#8221;";
-            }
-            return "&#8220;";
-        }
+        // if (/^'$/.test(text)) {
+        //   // Special case: single-character ' token
+        //   if (/\S/.test(this.smartyPantsLastChar)) {
+        //     return "&#8217;";
+        //   }
+        //   return "&#8216;";
+        // }
+        // if (/^"$/.test(text)) {
+        //   // Special case: single-character " token
+        //   if (/\S/.test(this.smartyPantsLastChar)) {
+        //     return "&#8221;";
+        //   }
+        //   return "&#8220;";
+        // }
 
         // Special case if the very first character is a quote
         // followed by punctuation at a non-word-break. Close the quotes by brute force:
-        text = text.replace(/^'(?=[!"#\$\%'()*+,\-.\/:;<=>?\@\[\\]\^_`{|}~]\B)/, "&#8217;");
-        text = text.replace(/^"(?=[!"#\$\%'()*+,\-.\/:;<=>?\@\[\\]\^_`{|}~]\B)/, "&#8221;");
+        // text = text.replace(/^'(?=[!"#\$\%'()*+,\-.\/:;<=>?\@\[\\]\^_`{|}~]\B)/, "&#8217;");
+        // text = text.replace(/^"(?=[!"#\$\%'()*+,\-.\/:;<=>?\@\[\\]\^_`{|}~]\B)/, "&#8221;");
 
         // Special case for double sets of quotes, e.g.:
         //   <p>He said, "'Quoted' words in a larger quote."</p>
-        text = text.replace(/"'(?=\w)/g, "&#8220;&#8216;");
-        text = text.replace(/'"(?=\w)/g, "&#8216;&#8220;");
+        // text = text.replace(/"'(?=\w)/g, "&#8220;&#8216;");
+        // text = text.replace(/'"(?=\w)/g, "&#8216;&#8220;");
 
         // Special case for decade abbreviations (the '80s):
-        text = text.replace(/'(?=\d{2}s)/g, "&#8217;");
+        // text = text.replace(/'(?=\d{2}s)/g, "&#8217;");
 
         // Get most opening single quotes:
-        text = text.replace(/(\s|&nbsp;|--|&[mn]dash;|&\#8211;|&\#8212;|&\#x201[34];)'(?=\w)/g, "$1&#8216;");
+        // text = text.replace(/(\s|&nbsp;|--|&[mn]dash;|&\#8211;|&\#8212;|&\#x201[34];)'(?=\w)/g, "$1&#8216;");
 
         // Single closing quotes:
-        text = text.replace(/([^\s\[\{\(\-])'/g, "$1&#8217;");
-        text = text.replace(/'(?=\s|s\b)/g, "&#8217;");
+        // text = text.replace(/([^\s\[\{\(\-])'/g, "$1&#8217;");
+        // text = text.replace(/'(?=\s|s\b)/g, "&#8217;");
 
         // Any remaining single quotes should be opening ones:
-        text = text.replace(/'/g, "&#8216;");
+        // text = text.replace(/'/g, "&#8216;");
 
         // Get most opening double quotes:
-        text = text.replace(/(\s|&nbsp;|--|&[mn]dash;|&\#8211;|&\#8212;|&\#x201[34];)"(?=\w)/g, "$1&#8220;");
+        // text = text.replace(/(\s|&nbsp;|--|&[mn]dash;|&\#8211;|&\#8212;|&\#x201[34];)"(?=\w)/g, "$1&#8220;");
 
         // Double closing quotes:
-        text = text.replace(/([^\s\[\{\(\-])"/g, "$1&#8221;");
-        text = text.replace(/"(?=\s)/g, "&#8221;");
+        // text = text.replace(/([^\s\[\{\(\-])"/g, "$1&#8221;");
+        // text = text.replace(/"(?=\s)/g, "&#8221;");
 
         // Any remaining quotes should be opening ones.
-        text = text.replace(/"/ig, "&#8220;");
+        // text = text.replace(/"/ig, "&#8220;");
         return text;
     };
 
@@ -732,7 +732,7 @@
      * Definition Lists                                                *
      ******************************************************************/
 
-        // Find and convert markdown extra definition lists into html.
+    // Find and convert markdown extra definition lists into html.
     Markdown.Extra.prototype.definitionLists = function (text) {
         var wholeList = new RegExp(
             ['(\\x02\\n?|\\n\\n)',
