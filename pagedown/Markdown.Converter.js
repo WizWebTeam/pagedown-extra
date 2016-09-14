@@ -1459,7 +1459,8 @@ else
             text = text.replace(/&(?!#?[xX]?(?:[0-9a-fA-F]+|\w+);)/g, "&amp;");
 
             // Encode naked <'s
-            text = text.replace(/<(?![a-z\/?!]|~D)/gi, "&lt;");
+            // support x<<y
+            text = text.replace(/<(?!([a-z\/?!][^<>]*>)|~D)/gi, "&lt;");
 
             return text;
         }
