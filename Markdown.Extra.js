@@ -604,7 +604,7 @@ var Markdown = {};
             if (self.codeMirror) {
                 html = ['<div class="wiz-code-container" contenteditable="false"',
                     ' data-mode="', language, '" data-theme="', theme, '"><textarea readonly style="display:none;">',
-                    encodeCode(codeblock), '</textarea>'].join('');
+                    encodeCode(codeblock), '</textarea></div>'].join('');
 
             } else {
                 // adhere to specified options
