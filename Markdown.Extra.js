@@ -158,6 +158,7 @@ var Markdown = {};
         // Fenced code block options
         this.googleCodePrettify = false;
         this.highlightJs = false;
+        this.codeMirror = false;
 
         // Table options
         this.tableClass = '';
@@ -244,6 +245,7 @@ var Markdown = {};
         if ("highlighter" in options) {
             extra.googleCodePrettify = options.highlighter === 'prettify';
             extra.highlightJs = options.highlighter === 'highlight';
+            extra.codeMirror = options.highlighter === 'codeMirror';
         }
 
         if ("table_class" in options) {
@@ -592,22 +594,34 @@ var Markdown = {};
 
         var self = this;
         text = text.replace(/(?:^|\n)```[ \t]*(\S*)[ \t]*\n([\s\S]*?)\n```[ \t]*(?=\n)/g, function (match, m1, m2) {
-            var language = m1, codeblock = m2;
-
-            // adhere to specified options
-            var preclass = self.googleCodePrettify ? ' class="prettyprint linenums"' : '';
-            var codeclass = '';
-            if (language) {
-                if (self.googleCodePrettify || self.highlightJs) {
-                    // use html5 language- class names. supported by both prettify and highlight.js
-                    codeclass = ' class="language-' + language + '"';
-                } else {
-                    codeclass = ' class="' + language + '"';
-                }
+            var codeOption = m1.split(','), codeblock = m2,
+                language = codeOption[0].trim(), theme;
+            if (codeOption.length > 1) {
+                theme = codeOption[1].trim();
             }
 
-            var html = ['<pre', preclass, '><code', codeclass, '>',
-                encodeCode(codeblock), '</code></pre>'].join('');
+            var preclass, codeclass, html;
+            if (self.codeMirror) {
+                html = ['<div class="wiz-code-container" contenteditable="false"',
+                    ' data-mode="', language, '" data-theme="', theme, '"><textarea readonly style="display:none;">',
+                    encodeCode(codeblock), '</textarea>'].join('');
+
+            } else {
+                // adhere to specified options
+                preclass = self.googleCodePrettify ? ' class="prettyprint linenums"' : '';
+                codeclass = '';
+                if (language) {
+                    if (self.googleCodePrettify || self.highlightJs) {
+                        // use html5 language- class names. supported by both prettify and highlight.js
+                        codeclass = ' class="language-' + language + '"';
+                    } else {
+                        codeclass = ' class="' + language + '"';
+                    }
+                }
+
+                html = ['<pre', preclass, '><code', codeclass, '>',
+                    encodeCode(codeblock), '</code></pre>'].join('');
+            }
 
             // replace codeblock with placeholder until postConversion step
             return self.hashExtraBlock(html);
