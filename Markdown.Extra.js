@@ -176,9 +176,14 @@
         options = options || {};
         options.extensions = options.extensions || ["all"];
         if (contains(options.extensions, "all")) {
-            options.extensions = ["tables", "fenced_code_gfm", "def_list", "attr_list", "footnotes", "smartypants", "strikethrough", "newlines"];
+            options.extensions = ["tables", "fenced_code_gfm", "def_list", "attr_list", "footnotes", "smartypants",
+                "todo_list", "strikethrough", "newlines"];
         }
         preBlockGamutTransformations.push("wrapHeaders");
+
+        if (contains(options.extensions, "todo_list")) {
+            preBlockGamutTransformations.push("todo_list");
+        }
         if (contains(options.extensions, "attr_list")) {
             postNormalizationTransformations.push("hashFcbAttributeBlocks");
             preBlockGamutTransformations.push("hashHeaderAttributeBlocks");
@@ -867,6 +872,13 @@
         return removeAnchors(listStr);
     };
 
+    /***********************************************************
+     * todoList                                            *
+     ************************************************************/
+    Markdown.Extra.prototype.todo_list = function (text) {
+        return text.replace(/([ ]*)\[ \] /g, "$1<input type='checkbox' disabled class='wiz-markdown-todo'>")
+            .replace(/^([ ]*)\[x\] /g, "$1<input type='checkbox' disabled checked class='wiz-markdown-todo'>");
+    };
 
     /***********************************************************
      * Strikethrough                                            *
