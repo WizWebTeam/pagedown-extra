@@ -1065,7 +1065,14 @@ else
                         itemHtml = '</' + list_type + '>\n<' + cur_list_type + '>\n';
                         list_type = cur_list_type;
                     }
-                    itemHtml += ("<li>" + item + "</li>\n");
+                    // 判断是否为 todo_list
+                    var todoRegExp = /^<input [^<>]* class='wiz-md-todo-checkbox'[^<>]*>/i;
+                    if (todoRegExp.test(item)) {
+                        itemHtml += "<li class='wiz-md-todo-list-item'>";
+                    } else {
+                        itemHtml += "<li>";
+                    }
+                    itemHtml += (item + "</li>\n");
 
                     last_item_had_a_double_newline = ends_with_double_newline;
                     return itemHtml;
