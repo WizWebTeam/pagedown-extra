@@ -876,8 +876,8 @@
      * todoList                                            *
      ************************************************************/
     Markdown.Extra.prototype.todo_list = function (text) {
-        return text.replace(/([ ]*)\[ \] /g, "$1<input type='checkbox' disabled class='wiz-markdown-todo'>")
-            .replace(/^([ ]*)\[x\] /g, "$1<input type='checkbox' disabled checked class='wiz-markdown-todo'>");
+        return text.replace(/^([ ]*)\[ \] /g, "$1<input type='checkbox' disabled class='wiz-md-todo-checkbox'>")
+            .replace(/^([ ]*)\[x\] /g, "$1<input type='checkbox' disabled checked class='wiz-md-todo-checkbox'>");
     };
 
     /***********************************************************
