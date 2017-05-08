@@ -944,7 +944,7 @@ else
                     var opening = "<" + list_type;
                     //if (first_number && first_number !== 1)
                     //    opening += " start=\"" + first_number + "\"";
-                    resultStr = opening + ">" + resultStr + "</" + result.list_type + ">\n";
+                    resultStr = opening + ">" + resultStr + "</" + result.list_type + ">\n\n";
                     list_type = result.list_type;
                     return resultStr;
                 });
@@ -965,7 +965,7 @@ else
                     //if (first_number && first_number !== 1)
                     //    opening += " start=\"" + first_number + "\"";
 
-                    var resultStr = runup + opening + ">\n" + result.list_str + "</" + result.list_type + ">\n";
+                    var resultStr = runup + opening + ">\n" + result.list_str + "</" + result.list_type + ">\n\n";
                     list_type = result.list_type;
                     return resultStr;
                 });
