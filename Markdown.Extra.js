@@ -605,7 +605,11 @@
 
             var preclass, codeclass, html;
             // 流程图、序列图保持原样
-            if (self.codeMirror && language !== 'flow' && language !== 'sequence') {
+            if (language === 'flow' || language === 'sequence') {
+                codeclass = ' class="language-' + language + '"';
+                html = ['<pre><textarea readonly style="display:none;"', codeclass, '>',
+                    encodeCode(codeblock), '</textarea></pre>'].join('');
+            } else if (self.codeMirror) {
                 html = ['<div class="wiz-code-container" contenteditable="false"',
                     ' data-mode="', language, '" data-theme="', theme, '"><textarea readonly style="display:none;">',
                     encodeCode(codeblock), '</textarea></div>'].join('');
