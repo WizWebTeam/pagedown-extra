@@ -604,7 +604,8 @@
             }
 
             var preclass, codeclass, html;
-            if (self.codeMirror) {
+            // 流程图、序列图保持原样
+            if (self.codeMirror && language !== 'flow' && language !== 'sequence') {
                 html = ['<div class="wiz-code-container" contenteditable="false"',
                     ' data-mode="', language, '" data-theme="', theme, '"><textarea readonly style="display:none;">',
                     encodeCode(codeblock), '</textarea></div>'].join('');
@@ -614,7 +615,7 @@
                 preclass = self.googleCodePrettify ? ' class="prettyprint linenums"' : '';
                 codeclass = '';
                 if (language) {
-                    if (self.googleCodePrettify || self.highlightJs) {
+                    if (self.codeMirror || self.googleCodePrettify || self.highlightJs) {
                         // use html5 language- class names. supported by both prettify and highlight.js
                         codeclass = ' class="language-' + language + '"';
                     } else {
