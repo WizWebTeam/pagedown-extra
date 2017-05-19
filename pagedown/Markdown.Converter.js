@@ -923,7 +923,7 @@ else
              )
              /g
              */
-            var whole_list = /^(([ ]{0,3}([*+-]|\d+[.])[ \t]+)[^\r]+?(~0|\n{2,}(?=\S)(?![ \t]*(?:[*+-]|\d+[.])[ \t]+)))/gm;
+            var whole_list = /^(([ ]{0,3}([*+-]|\d+[.])[ \t]+)[^\r]*?(~0|\n{2,}(?=\S)(?![ \t]*(?:[*+-]|\d+[.])[ \t]+)))/gm;
             var list_type;
             if (g_list_level) {
                 text = text.replace(whole_list, function (wholeMatch, m1, m2) {
@@ -1047,7 +1047,7 @@ else
             //2015-10-22 wiz: 修改 list 的支持规则， 同级的 无序列表 和 有序列表 不会自动处理为 父子关系， 而是生成平级的两个列表；
             //var marker = _listItemMarkers[list_type];
             //var re = new RegExp("(^[ \\t]*)(" + marker + ")[ \\t]+([^\\r]+?(\\n+))(?=(~0|\\1(" + marker + ")[ \\t]+))", "gm");
-            var re = new RegExp("(^[ \\t]*)([*+-]|\\d+[.])[ \\t]+([^\\r]+?(\\n+))(?=(~0|\\1([*+-]|\\d+[.])[ \\t]+))", "gm");
+            var re = new RegExp("(^[ \\t]*)([*+-]|\\d+[.])[ \\t]+([^\\r]*?(\\n+))(?=(~0|\\1([*+-]|\\d+[.])[ \\t]+))", "gm");
             var last_item_had_a_double_newline = false;
             list_str = list_str.replace(re,
                 function (wholeMatch, m1, m2, m3) {
