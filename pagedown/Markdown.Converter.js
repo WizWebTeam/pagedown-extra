@@ -1056,6 +1056,7 @@ else
                     var cur_list_type = getListType(m2);
                     var ends_with_double_newline = /\n\n$/.test(item);
                     var contains_double_newline = ends_with_double_newline || item.search(/\n{2,}/) > -1;
+                    var isTodo = /^\[( |x)\]/.test(item);
 
                     var loose = contains_double_newline || last_item_had_a_double_newline;
                     item = _RunBlockGamut(_Outdent(item), /* doNotUnhash = */true, /* doNotCreateParagraphs = */ !loose);
@@ -1066,8 +1067,7 @@ else
                         list_type = cur_list_type;
                     }
                     // 判断是否为 todo_list
-                    var todoRegExp = /^<input [^<>]* class='wiz-md-todo-checkbox'[^<>]*>/i;
-                    if (todoRegExp.test(item)) {
+                    if (isTodo) {
                         itemHtml += "<li class='wiz-md-todo-list-item'>";
                     } else {
                         itemHtml += "<li>";
