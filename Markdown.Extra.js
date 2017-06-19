@@ -891,8 +891,10 @@
 
     Markdown.Extra.prototype.strikethrough = function (text) {
         // Pretty much duplicated from _DoItalicsAndBold
-        return text.replace(/([\W_]|^)~T~T(?=\S)([^\r]*?\S[\*_]*)~T~T([\W_]|$)/g,
-            "$1<del>$2</del>$3");
+        // return text.replace(/([\W_]|^)~T~T(?=\S)([^\r]*?\S[\*_]*)~T~T([\W_]|$)/g,
+        //     "$1<del>$2</del>$3");
+        return text.replace(/~T~T(?=\S)([^\r]*?\S[\*_]*)~T~T/g,
+            "<del>$1</del>");
     };
 
 
