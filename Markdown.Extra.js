@@ -689,7 +689,7 @@ var Markdown = {};
 
     Markdown.Extra.prototype.applyPants = function (text) {
         // Dashes
-        text = text.replace(/---/g, "&#8212;").replace(/--/g, "&#8211;");
+        // text = text.replace(/---/g, "&#8212;").replace(/--/g, "&#8211;");
         // Ellipses
         text = text.replace(/\.\.\./g, "&#8230;").replace(/\.\s\.\s\./g, "&#8230;");
         // Backticks
